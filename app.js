@@ -80,6 +80,21 @@ app.route("/articles/:articleTitle")
       res.send("No Articles Matching that Title was Found");
     }
   })
+})
+
+.patch(function(req, res){
+  Article.update(
+    {title: req.params.articleTitle},
+    {$set: req.body},
+    function(err){
+      if(!err){
+        res.send("Successfully updated articles");
+      }
+      else{
+        res.send(err);
+      }
+    }
+  );
 });
 
 app.listen(3000, function() {
