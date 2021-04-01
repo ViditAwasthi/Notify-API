@@ -12,14 +12,16 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(express.static("public"));
 
-mongoose.connect("mongodb://localhost:27017/wikiDB", {useNewUrlParser: true});
+mongoose.connect("mongodb://localhost:27017/wikiDB", {
+  useNewUrlParser: true
+});
 
-const articleSchema={
+const articleSchema = {
   title: String,
   content: String
 };
 
-const Article = mongoose.model("Article",articleSchema);
+const Article = mongoose.model("Article", articleSchema);
 
 
 // Requests Targetting all the Articles
@@ -27,86 +29,86 @@ const Article = mongoose.model("Article",articleSchema);
 
 app.route("/articles")
 
-.get(function(req, res){
-  Article.find(function(err, foundArticles){
-    if(!err){
-      res.send(foundArticles);
+  .get(function(req, res) {
+    Article.find(function(err, foundArticles) {
+      if (!err) {
+        res.send(foundArticles);
 
-    }
-    else{
-      res.send(err);
-    }
+      } else {
+        res.send(err);
+      }
+    })
   })
-})
 
-.post(function(req, res){
+  .post(function(req, res) {
 
-  const newArticle = new Article({
-    title: req.body.title,
-    content: req.body.content
-  });
-  newArticle.save(function(err){
-    if(!err){
-      res.send("Successfully added a New Article.");
-    }
-    else{
-      res.send(err);
-    }
-  });
-})
+    const newArticle = new Article({
+      title: req.body.title,
+      content: req.body.content
+    });
+    newArticle.save(function(err) {
+      if (!err) {
+        res.send("Successfully added a New Article.");
+      } else {
+        res.send(err);
+      }
+    });
+  })
 
-.delete(function(req,res){
-  Article.deleteMany(function(err){
-    if(!err){
-      res.send("Successfully Deleted All Articles.");
-    }
-    else{
-      res.send(err);
-    }
+  .delete(function(req, res) {
+    Article.deleteMany(function(err) {
+      if (!err) {
+        res.send("Successfully Deleted All Articles.");
+      } else {
+        res.send(err);
+      }
+    });
   });
-});
 
 // Requests Targetting a Specific Article
 
 app.route("/articles/:articleTitle")
 
-.get(function(req, res){
+  .get(function(req, res) {
 
-  Article.findOne({title:req.params.articleTitle}, function(err, foundArticle){
-    if(foundArticle){
-      res.send(foundArticle);
-    }
-    else{
-      res.send("No Articles Matching that Title was Found");
-    }
-  })
-})
-
-.patch(function(req, res){
-  Article.update(
-    {title: req.params.articleTitle},
-    {$set: req.body},
-    function(err){
-      if(!err){
-        res.send("Successfully updated articles");
+    Article.findOne({
+      title: req.params.articleTitle
+    }, function(err, foundArticle) {
+      if (foundArticle) {
+        res.send(foundArticle);
+      } else {
+        res.send("No Articles Matching that Title was Found");
       }
-      else{
+    })
+  })
+
+  .patch(function(req, res) {
+    Article.update({
+        title: req.params.articleTitle
+      }, {
+        $set: req.body
+      },
+      function(err) {
+        if (!err) {
+          res.send("Successfully updated articles");
+        } else {
+          res.send(err);
+        }
+      }
+    );
+  })
+
+  .delete(function(req, res) {
+    Article.deleteOne({
+      title: req.params.articleTitle
+    }, function(err) {
+      if (!err) {
+        res.send("Successfully Deleted the Corresponding Article.");
+      } else {
         res.send(err);
       }
-    }
-  );
-})
-
-.delete(function(req, res){
-  Article.deleteOne({title: req.params.articleTitle}, function(err){
-    if(!err){
-      res.send("Successfully Deleted the Corresponding Article.");
-    }
-    else{
-      res.send(err);
-    }
-  })
-});
+    })
+  });
 
 app.listen(3000, function() {
   console.log("Server started on port 3000");
